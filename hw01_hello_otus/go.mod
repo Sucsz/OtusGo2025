@@ -1,4 +1,4 @@
-module github.com/Sucsz/OtusGo2025g/hw01_hello_otus
+module github.com/Sucsz/OtusGo2025/hw01_hello_otus
 
 go 1.23.4
 
