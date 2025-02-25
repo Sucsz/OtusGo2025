@@ -79,4 +79,68 @@ func TestTop10(t *testing.T) {
 			require.Equal(t, expected, Top10(text))
 		}
 	})
+
+	tests := []struct {
+		name     string
+		input    string
+		expected []string
+	}{
+		{
+			name:     "More10EqFreq",
+			input:    "b b c c d d a a e e f f g g h h i i j j k k l l m m n n o p r s t t",
+			expected: []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"},
+		},
+		{
+			name:     "More10DifFreq",
+			input:    "b b c c d d a a e e f f g g h h i i j j k k l l m m n n o p r s t t t",
+			expected: []string{"t", "a", "b", "c", "d", "e", "f", "g", "h", "i"},
+		},
+		{
+			name:     "Less10EqFreq",
+			input:    "b b c c d d a a e e f f g g",
+			expected: []string{"a", "b", "c", "d", "e", "f", "g"},
+		},
+		{
+			name:     "Less10DifFreq",
+			input:    "b b c c d d a a e e f f g g h h h",
+			expected: []string{"h", "a", "b", "c", "d", "e", "f", "g"},
+		},
+		{
+			name:     "EqFreqRegister",
+			input:    "b b c c d d a a e e F F G G H H",
+			expected: []string{"F", "G", "H", "a", "b", "c", "d", "e"},
+		},
+		{
+			name:     "DifFreqRegister",
+			input:    "b b b c c d d a a e e F F G G H H",
+			expected: []string{"b", "F", "G", "H", "a", "c", "d", "e"},
+		},
+		{
+			name:     "Single",
+			input:    "a",
+			expected: []string{"a"},
+		},
+		{
+			name:     "EqualWords",
+			input:    "a a a",
+			expected: []string{"a"},
+		},
+		{
+			name:     "Punctuation",
+			input:    "нога, нога! нога? 'нога' -нога",
+			expected: []string{"'нога'", "-нога", "нога!", "нога,", "нога?"},
+		},
+		{
+			name:     "Whitespaces",
+			input:    "a  a\tb\nc\vd\fe",
+			expected: []string{"a", "b", "c", "d", "e"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := Top10(tc.input)
+			require.Equal(t, tc.expected, result)
+		})
+	}
 }
