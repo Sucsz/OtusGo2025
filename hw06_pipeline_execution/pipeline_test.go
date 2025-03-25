@@ -150,6 +150,65 @@ func TestAllStageStop(t *testing.T) {
 		wg.Wait()
 
 		require.Len(t, result, 0)
-
 	})
+}
+
+func stageGenerator(_ string, f func(v interface{}) interface{}) Stage {
+	return func(in In) Out {
+		out := make(Bi)
+		go func() {
+			defer close(out)
+			for v := range in {
+				time.Sleep(sleepPerStage)
+				out <- f(v)
+			}
+		}()
+		return out
+	}
+}
+
+func TestEmptyInput(t *testing.T) {
+	stages := []Stage{
+		stageGenerator("Multiplier (*2)", func(v interface{}) interface{} { return v.(int) * 2 }),
+		stageGenerator("Adder (+100)", func(v interface{}) interface{} { return v.(int) + 100 }),
+	}
+
+	in := make(Bi)
+	close(in)
+
+	out := ExecutePipeline(in, nil, stages...)
+
+	count := 0
+	for range out {
+		count++
+	}
+	if count != 0 {
+		t.Errorf("expected 0 results, got %d", count)
+	}
+}
+
+func TestCancellationBeforeStart(t *testing.T) {
+	stages := []Stage{
+		stageGenerator("multiplier (*2)", func(v interface{}) interface{} { return v.(int) * 2 }),
+		stageGenerator("Adder (+100)", func(v interface{}) interface{} { return v.(int) + 100 }),
+	}
+	in := make(Bi)
+	done := make(Bi)
+	close(done)
+
+	go func() {
+		for i := 1; i <= 5; i++ {
+			in <- i
+		}
+		close(in)
+	}()
+
+	out := ExecutePipeline(in, done, stages...)
+	count := 0
+	for range out {
+		count++
+	}
+	if count != 0 {
+		t.Errorf("expected 0 results, got %d", count)
+	}
 }

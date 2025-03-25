@@ -1,6 +1,6 @@
 module github.com/Sucsz/OtusGo2025/hw05_parallel_execution
 
-go 1.22
+go 1.23.4
 
 require (
 	github.com/stretchr/testify v1.7.0
