@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"log"
 )
 
 var (
@@ -18,5 +20,18 @@ func init() {
 
 func main() {
 	flag.Parse()
-	// Place your code here.
+
+	if from == "" || to == "" {
+		log.Fatal("Usage: -from <source> -to <destination> [-offset N] [-limit N]")
+	}
+
+	if offset < 0 || limit < 0 {
+		log.Fatal("offset and limit must be non-negative")
+	}
+
+	if err := Copy(from, to, offset, limit); err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	fmt.Println("Copy succeeded.")
 }
